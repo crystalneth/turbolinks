@@ -63,20 +63,32 @@ fetchHistory = (cachedPage) ->
   recallScrollPosition cachedPage
   triggerEvent 'page:restore'
 
-
 cacheCurrentPage = ->
-  currentStateUrl = new ComponentUrl currentState.url
+  cachePage(currentState.url, document, window)
 
-  pageCache[currentStateUrl.absolute] =
-    url:                      currentStateUrl.relative,
-    body:                     document.body,
-    title:                    document.title,
-    positionY:                window.pageYOffset,
-    positionX:                window.pageXOffset,
+cachePage = (url, doc, wind) ->
+  componentUrl = new ComponentUrl url
+  pageCache[componentUrl.absolute] =
+    url:                      componentUrl.relative,
+    body:                     doc.body,
+    title:                    doc.title,
+    positionY:                wind?.pageYOffset,
+    positionX:                wind?.pageXOffset,
     cachedAt:                 new Date().getTime(),
-    transitionCacheDisabled:  document.querySelector('[data-no-transition-cache]')?
+    transitionCacheDisabled:  doc.querySelector('[data-no-transition-cache]')?
 
   constrainPageCacheTo cacheSize
+
+prefetchPage = (url) ->
+  iframe = document.createElement 'iframe'
+  iframe.src = url
+  unless pageCache[iframe.src]
+    iframe.style.cssText = 'display: none'
+    iframe.onload = =>
+      cachePage iframe.src, iframe.contentWindow.document
+
+    document.body.appendChild iframe
+
 
 pagesCached = (size = cacheSize) ->
   cacheSize = parseInt(size) if /^[\d]+$/.test size
