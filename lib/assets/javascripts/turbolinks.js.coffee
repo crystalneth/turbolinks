@@ -82,7 +82,7 @@ prefetchPage = (url) ->
   iframe = document.createElement 'iframe'
   iframe.src = url
   unless pageCache[iframe.src]
-    iframe.style.cssText = 'display: none'
+    iframe.style.cssText = 'visibility: hidden'
     iframe.onload = =>
       cachePage iframe.src, iframe.contentWindow.document
 
