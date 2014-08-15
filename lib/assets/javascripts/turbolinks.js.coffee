@@ -79,6 +79,8 @@ cachePage = (url, doc, wind) ->
   constrainPageCacheTo cacheSize
 
 prefetchPage = (url) ->
+  return if inIframe()
+
   iframe = document.createElement 'iframe'
   iframe.src = url
   unless pageCache[iframe.src]
@@ -88,6 +90,11 @@ prefetchPage = (url) ->
 
     document.body.appendChild iframe
 
+inIframe = ->
+  try
+    return window.self != window.top
+  catch e
+    return true
 
 pagesCached = (size = cacheSize) ->
   cacheSize = parseInt(size) if /^[\d]+$/.test size
