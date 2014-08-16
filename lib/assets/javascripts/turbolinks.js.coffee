@@ -87,6 +87,7 @@ prefetchPage = (url) ->
     iframe.style.cssText = 'visibility: hidden'
     iframe.onload = =>
       cachePage iframe.src, iframe.contentWindow.document
+      iframe.parentNode.removeChild(iframe)
 
     document.body.appendChild iframe
 
