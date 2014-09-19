@@ -79,16 +79,23 @@ cachePage = (url, doc, wind) ->
   constrainPageCacheTo cacheSize
 
 prefetchPage = (url) ->
-  return if inIframe() || pageCache[iframe.src]
+  return if inIframe()
 
-  iframe = document.createElement 'iframe'
-  iframe.src = url
-  iframe.style.cssText = 'visibility: hidden'
-  iframe.onload = =>
-    cachePage iframe.src, iframe.contentWindow.document
-    iframe.parentNode.removeChild(iframe)
+  a = document.createElement 'a'
+  a.href = url
+  url = a.cloneNode(false).href
 
-  document.body.appendChild iframe
+  if pageCache[url]
+    document.removeChild(a)
+  else
+    iframe = document.createElement 'iframe'
+    iframe.src = url
+    iframe.style.cssText = 'display: none;'
+    iframe.onload = =>
+      cachePage iframe.src, iframe.contentWindow.document
+      iframe.parentNode.removeChild(iframe)
+
+    document.body.appendChild iframe
 
 inIframe = ->
   try
